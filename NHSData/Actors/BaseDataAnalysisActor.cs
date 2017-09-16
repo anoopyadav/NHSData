@@ -1,6 +1,8 @@
 ﻿using System;
 using System.CodeDom;
 using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using Akka.Actor;
 using Akka.Event;
 using CsvHelper;
@@ -13,31 +15,32 @@ namespace NHSData.Actors
 {
     public abstract class BaseDataAnalysisActor : ReceiveActor
     {
-        private readonly ILoggingAdapter _logger;
-        private readonly IDataAnalyzer _analyzer;
-        private readonly IConfiguration _configuration;
-        private readonly ICsvReader _csvReader;
+        protected ILoggingAdapter Logger { get; }
+        protected IDataAnalyzer Analyzer { get; }
+        protected IConfiguration Configuration { get; }
+        protected ICsvReader CsvReader { get; }
 
         protected BaseDataAnalysisActor(IDataAnalyzer analyzer, IConfiguration configuration)
         {
-            _analyzer = analyzer;
-            _configuration =  configuration;
-            _csvReader = configuration.Reader;
-            _logger = Context.GetLogger();
-            Stopped();
-        }
+            Analyzer = analyzer;
+            Configuration =  configuration;
+            CsvReader = configuration.Reader;
+            Logger = Context.GetLogger();
 
-        private void Stopped()
-        {
             Receive<InitiateAnalysisMessage>(message =>
             {
-                _logger.Info("Received InitiateAnalysisMessage, Proceeding with file analysis.");
-                Become(Reading);
+                Logger.Info("Received InitiateAnalysisMessage, Proceeding with file analysis.");
+                PerformAnalysis();
             });
+
+            Receive<PublishResultsMessage>(message =>
+            {
+                Logger.Info("Publishing Results.");
+                Logger.Info($"Results - {Analyzer.GetResults().First().ToString()}");
+            });
+
         }
 
-        protected abstract void Reading();
-
-        protected abstract void Done();
+        protected abstract void PerformAnalysis();
     }
 }

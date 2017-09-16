@@ -1,7 +1,9 @@
-﻿using System.Runtime.Remoting.Messaging;
-using Akka.Actor;
+﻿using System;
+using System.ComponentModel;
 using NHSData.Common;
 using NHSData.DataAnalyzers;
+using NHSData.DataObjects;
+using NHSData.Messages;
 
 namespace NHSData.Actors
 {
@@ -10,17 +12,17 @@ namespace NHSData.Actors
         public AddressDataAnalysisActor(IDataAnalyzer analyzer, IConfiguration configuration)
             : base(analyzer, configuration)
         {
-            
+
         }
 
-        protected override void Reading()
+        protected override void PerformAnalysis()
         {
-            throw new System.NotImplementedException();
-        }
-
-        protected override void Done()
-        {
-            throw new System.NotImplementedException();
+            while (CsvReader.Read())
+            {
+                var row = CsvReader.GetRecord<Address>();
+                Analyzer.ConsumeRow(row);
+            }
+            Context.Parent.Tell(new FileAnalysisFinishedMessage(), Self);
         }
     }
 }

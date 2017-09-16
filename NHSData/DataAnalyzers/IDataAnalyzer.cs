@@ -10,5 +10,6 @@ namespace NHSData.DataAnalyzers
     {
         void ConsumeRow(IDataRow row);
         IEnumerable<Tuple<string, string>> GetResults();
+        void PublishResults();
     }
 }

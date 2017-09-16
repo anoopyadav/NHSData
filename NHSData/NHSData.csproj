@@ -75,6 +75,9 @@
     <Compile Include="DataAnalyzers\IDataAnalyzer.cs" />
     <Compile Include="DataObjects\Address.cs" />
     <Compile Include="DataObjects\DataRow.cs" />
+    <Compile Include="Messages\FileAnalysisFinishedMessage.cs" />
+    <Compile Include="Messages\PublishResultsMessage.cs" />
+    <Compile Include="Messages\GetResultsResponseMessage.cs" />
     <Compile Include="Messages\InitiateAnalysisMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
