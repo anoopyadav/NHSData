@@ -27,7 +27,7 @@ namespace NHSData.DataAnalyzers
 
         private void CountLocations(Address row)
         {
-            if (true)
+            if (row.Locality.Replace(" ", string.Empty).Equals(_location, StringComparison.InvariantCultureIgnoreCase))
             {
                 _locationCount++;
             }
@@ -39,7 +39,6 @@ namespace NHSData.DataAnalyzers
             {
                 new Tuple<string, string>($"Practices in {_location}", _locationCount.ToString())
             };
-            Console.WriteLine(results[0]);
 
             return results;
         }
