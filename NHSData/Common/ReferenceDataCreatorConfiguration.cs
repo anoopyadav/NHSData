@@ -7,21 +7,18 @@ using NHSData.ReferenceData;
 
 namespace NHSData.Common
 {
-    public class AddressConfiguration : IConfiguration
+    public class ReferenceDataCreatorConfiguration : IConfiguration
     {
         public ICsvReader Reader { get; }
         public IReferenceDataReader ReferenceDataReader { get; }
         public IReferenceDataWriter ReferenceDataWriter { get; }
 
-        public AddressConfiguration()
+        public ReferenceDataCreatorConfiguration()
         {
             var csvConfiguration = new CsvConfiguration();
-            csvConfiguration.RegisterClassMap<AddressMap>();
-            var path = Path.Combine
-                (ConfigurationManager.AppSettings["DataDirectory"], "address.csv");
+            csvConfiguration.RegisterClassMap<PostcodeMap>();
+            var path = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "location.csv");
             Reader = new CsvReader(new StreamReader(File.OpenRead(path)), csvConfiguration);
-            ReferenceDataWriter = new AddressReferenceDataWriter();
-            ReferenceDataReader = null;
         }
     }
 }

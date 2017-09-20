@@ -6,6 +6,7 @@ namespace NHSData.Common
     public interface IConfiguration
     {
         ICsvReader Reader { get; }
+        IReferenceDataReader ReferenceDataReader { get; }
         IReferenceDataWriter ReferenceDataWriter { get; }
     }
 }

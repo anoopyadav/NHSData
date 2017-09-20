@@ -14,37 +14,47 @@ namespace NHSData.Actors
     public class CoordinatorActor : ReceiveActor
     {
         private readonly ILoggingAdapter _logger;
-        private int _responseCount;
-        private readonly IList<IActorRef> _dataAnalysisActors;
+        private IActorRef _addressDataAnalysisActor;
+        private IActorRef _referenceDataCreatorActor;
 
         public CoordinatorActor()
         {
             _logger = Context.GetLogger();
             _logger.Info("Coordinator Initailized");
 
-            _dataAnalysisActors = new List<IActorRef>();
+            CreateActors();
+
+            _addressDataAnalysisActor.Tell(new InitiateAnalysisMessage());
+            Become(AnalyseAddresses);
+        }
+
+        private void AnalyseAddresses()
+        {
+            Receive<FileAnalysisFinishedMessage>(message => HandleFileAnalysisFinishedMessage(message));
+        }
+
+        private void CreateActors()
+        {
             IConfiguration configuration = new AddressConfiguration();
             IDataAnalyzer analyzer = new AddressDataAnalyzer("London");
-            IActorRef actor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor(analyzer, configuration)), nameof(AddressDataAnalysisActor));
-            _dataAnalysisActors.Add(actor);
-            actor.Tell(new InitiateAnalysisMessage());
-
-            Receive<FileAnalysisFinishedMessage>(message => HandleFileAnalysisFinishedMessage(message));
+            _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor(analyzer, configuration)), nameof(AddressDataAnalysisActor));
+            
+            configuration = new ReferenceDataCreatorConfiguration();
+            _referenceDataCreatorActor =
+                Context.ActorOf(Props.Create(() => new ReferenceDataCreatorActor(configuration)));
         }
 
         private void HandleFileAnalysisFinishedMessage(FileAnalysisFinishedMessage message)
         {
             _logger.Info($"Received finished message from {Sender}");
-            _responseCount++;
 
-            if (_responseCount == 1)
+            if (Sender.Equals(_addressDataAnalysisActor))
             {
-
-                foreach (var actor in _dataAnalysisActors)
-                {
-                    _logger.Info("Sending Publish Message");
-                    actor.Tell(new PublishResultsMessage());
-                }
+                _logger.Info("Sending Publish Message");
+                _addressDataAnalysisActor.Tell(new PublishResultsMessage());
+            }
+            else if (Sender.Equals(_referenceDataCreatorActor))
+            {
                 Thread.Sleep(100);
                 Context.System.Terminate();
             }
