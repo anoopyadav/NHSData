@@ -26,7 +26,7 @@ namespace NHSData.Actors
         {
             while (CsvReader.Read())
             {
-                var row = CsvReader.GetRecord<Address>();
+                var row = CsvReader.GetRecord<AddressRow>();
                 Analyzer.ConsumeRow(row);
                 _referenceDataWriter.UpdateReferenceData(row);
             }

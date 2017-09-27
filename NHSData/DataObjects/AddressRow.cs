@@ -1,6 +1,6 @@
 ﻿namespace NHSData.DataObjects
 {
-    public class Address : IDataRow
+    public class AddressRow : IDataRow
     {
         public string Period { get; set; }
         public string PracticeCode { get; set; }

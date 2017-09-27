@@ -3,7 +3,7 @@ using NHSData.DataObjects;
 
 namespace NHSData.CsvMaps
 {
-    public sealed class PostcodeMap : CsvClassMap<Postcode>
+    public sealed class PostcodeMap : CsvClassMap<PostcodeRow>
     {
         public PostcodeMap()
         {

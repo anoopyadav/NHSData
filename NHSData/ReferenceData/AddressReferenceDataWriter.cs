@@ -38,7 +38,7 @@ namespace NHSData.ReferenceData
         }
         public void UpdateReferenceData(IDataRow row)
         {
-            var addressRow = (Address) row;
+            var addressRow = (AddressRow) row;
             if (!_practicesToPostcodeMap.ContainsKey(addressRow.PracticeCode))
             {
                 _practicesToPostcodeMap[StripWhitespace(addressRow.PracticeCode)] = 

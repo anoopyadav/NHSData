@@ -17,8 +17,10 @@ namespace NHSData.Common
         {
             var csvConfiguration = new CsvConfiguration();
             csvConfiguration.RegisterClassMap<PostcodeMap>();
-            var path = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "location.csv");
+            var path = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcodes.csv");
             Reader = new CsvReader(new StreamReader(File.OpenRead(path)), csvConfiguration);
+
+
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace NHSData.DataObjects
 {
-    public class Postcode : IDataRow
+    public class PostcodeRow : IDataRow
     {
         public string Postcode1 { get; set; }
         public string Postcode2 { get; set; }

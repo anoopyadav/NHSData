@@ -7,7 +7,7 @@ using NHSData.Common;
 using NHSData.CsvMaps;
 using NHSData.DataAnalyzers;
 using NHSData.Messages;
-using Address = NHSData.DataObjects.Address;
+using Address = NHSData.DataObjects.AddressRow;
 
 namespace NHSData.Actors
 {
