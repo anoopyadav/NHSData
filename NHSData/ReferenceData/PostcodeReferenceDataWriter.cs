@@ -46,7 +46,7 @@ namespace NHSData.ReferenceData
 
         public void WriteReferenceData()
         {
-            var destinationFile = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcode.csv");
+            var destinationFile = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "RegionReferenceData.csv");
             using (_referenceDataWriter = new CsvWriter(new StreamWriter(destinationFile)))
             {
                 _referenceDataWriter.WriteHeader<PostcodeReferenceData>();

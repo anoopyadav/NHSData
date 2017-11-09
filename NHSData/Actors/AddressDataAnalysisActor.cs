@@ -1,35 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using CsvHelper;
-using NHSData.Common;
 using NHSData.DataAnalyzers;
-using NHSData.DataObjects;
 using NHSData.Messages;
 using NHSData.ReferenceData;
 
 namespace NHSData.Actors
 {
-    public class AddressDataAnalysisActor : BaseDataAnalysisActor
+    public class AddressDataAnalysisActor<TRowType, TRowMap> : BaseDataAnalysisActor<TRowType, TRowMap>
     {
         private readonly IReferenceDataWriter _referenceDataWriter;
-        private readonly IDictionary<string, string> _practicesToPostcodeMap;
 
-        public AddressDataAnalysisActor(IDataAnalyzer analyzer, IConfiguration configuration)
-            : base(analyzer, configuration)
+        public AddressDataAnalysisActor(IDataAnalyzer analyzer, string sourcePath)
+            : base(analyzer, sourcePath)
         {
-            _referenceDataWriter = configuration.ReferenceDataWriter;
-            _practicesToPostcodeMap = new Dictionary<string, string>();
+            _referenceDataWriter = new AddressReferenceDataWriter();
         }
 
-        protected override void PerformAnalysis()
+        protected override void ProcessRow(DataRowMessage message)
         {
-            while (CsvReader.Read())
-            {
-                var row = CsvReader.GetRecord<AddressRow>();
-                Analyzer.ConsumeRow(row);
-                _referenceDataWriter.UpdateReferenceData(row);
-            }
+            dynamic row = Convert.ChangeType(message.Row, message.RowType);
+            Analyzer.ConsumeRow(row);
+            _referenceDataWriter.UpdateReferenceData(row);
+        }
+
+        protected override void PostAnalysis()
+        {
             Logger.Info("Publishing Address Reference Data.");
             _referenceDataWriter.WriteReferenceData();
             Context.Parent.Tell(new FileAnalysisFinishedMessage(), Self);

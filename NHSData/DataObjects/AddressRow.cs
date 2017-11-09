@@ -1,4 +1,6 @@
-﻿namespace NHSData.DataObjects
+﻿using System;
+
+namespace NHSData.DataObjects
 {
     public class AddressRow : IDataRow
     {

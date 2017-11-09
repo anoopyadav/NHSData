@@ -21,9 +21,9 @@ namespace NHSData.CsvMaps
             Map(m => m.WardCode).Name("Ward Code");
             Map(m => m.WardName).Name("Ward Name");
             Map(m => m.CountryCode).Name("Country Code");
-            Map(m => m.CountryName).Name("CountryName");
+            Map(m => m.CountryName).Name("Country Name");
             Map(m => m.RegionCode).Name("Region Code");
-            Map(m => m.RegionName).Name("RegionName");
+            Map(m => m.RegionName).Name("Region Name");
             Map(m => m.ParliamentaryConstituencyCode).Name("Parliamentary Constituency Code");
             Map(m => m.ParliamentaryConstituencyName).Name("Parliamentary Constituency Name");
             Map(m => m.EuropeanElectoralRegionCode).Name("European Electoral Region Code");

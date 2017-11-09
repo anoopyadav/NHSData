@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Threading;
 using Akka.Actor;
 using Akka.Event;
 using NHSData.Common;
 using NHSData.CsvMaps;
 using NHSData.DataAnalyzers;
+using NHSData.DataObjects;
 using NHSData.Messages;
-using Address = NHSData.DataObjects.AddressRow;
 
 namespace NHSData.Actors
 {
@@ -22,7 +24,7 @@ namespace NHSData.Actors
             _logger = Context.GetLogger();
             _logger.Info("Coordinator Initailized");
 
-            CreateActors();
+            CreateAddressAnalysisActor();
 
             _addressDataAnalysisActor.Tell(new InitiateAnalysisMessage());
             Become(AnalyseAddresses);
@@ -33,15 +35,20 @@ namespace NHSData.Actors
             Receive<FileAnalysisFinishedMessage>(message => HandleFileAnalysisFinishedMessage(message));
         }
 
-        private void CreateActors()
+        private void CreateAddressAnalysisActor()
         {
-            IConfiguration configuration = new AddressConfiguration();
+            //IConfiguration configuration = new AddressConfiguration();
             IDataAnalyzer analyzer = new AddressDataAnalyzer("London");
-            _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor(analyzer, configuration)), nameof(AddressDataAnalysisActor));
-            
-            configuration = new ReferenceDataCreatorConfiguration();
+            _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor<AddressRow, AddressMap>(analyzer, Path.Combine
+                (ConfigurationManager.AppSettings["DataDirectory"], "address.csv"))), nameof(AddressDataAnalysisActor<AddressRow, AddressMap>));
+        }
+
+        private void CreateReferenceDataCreatorActor()
+        {
+            IConfiguration configuration = new ReferenceDataCreatorConfiguration();
             _referenceDataCreatorActor =
                 Context.ActorOf(Props.Create(() => new ReferenceDataCreatorActor(configuration)));
+
         }
 
         private void HandleFileAnalysisFinishedMessage(FileAnalysisFinishedMessage message)
@@ -52,9 +59,13 @@ namespace NHSData.Actors
             {
                 _logger.Info("Sending Publish Message");
                 _addressDataAnalysisActor.Tell(new PublishResultsMessage());
-            }
-            else if (Sender.Equals(_referenceDataCreatorActor))
-            {
+
+                // Create the Reference Data now
+                //CreateReferenceDataCreatorActor();
+                //_referenceDataCreatorActor.Tell(new InitiateAnalysisMessage());
+            //}
+            //else if (Sender.Equals(_referenceDataCreatorActor))
+            //{
                 Thread.Sleep(100);
                 Context.System.Terminate();
             }

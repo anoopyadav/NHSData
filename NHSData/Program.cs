@@ -9,7 +9,7 @@ namespace NHSData
     public class Program
     {
         private static ActorSystem _nhsDataAnalysisActorSystem;
-        private static ILoggingAdapter _logger;
+        //private static ILoggingAdapter _logger;
         static void Main(string[] args)
         {
             RunActorSystem().Wait();
@@ -28,3 +28,4 @@ namespace NHSData
         }
     }
 }
+//
