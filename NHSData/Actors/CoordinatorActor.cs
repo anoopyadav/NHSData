@@ -25,12 +25,14 @@ namespace NHSData.Actors
             _logger.Info("Coordinator Initailized");
 
             CreateAddressAnalysisActor();
+            CreateReferenceDataCreatorActor();
 
             _addressDataAnalysisActor.Tell(new InitiateAnalysisMessage());
-            Become(AnalyseAddresses);
+            _referenceDataCreatorActor.Tell(new InitiateAnalysisMessage());
+            Become(Analyse);
         }
 
-        private void AnalyseAddresses()
+        private void Analyse()
         {
             Receive<FileAnalysisFinishedMessage>(message => HandleFileAnalysisFinishedMessage(message));
         }
@@ -45,10 +47,8 @@ namespace NHSData.Actors
 
         private void CreateReferenceDataCreatorActor()
         {
-            IConfiguration configuration = new ReferenceDataCreatorConfiguration();
-            _referenceDataCreatorActor =
-                Context.ActorOf(Props.Create(() => new ReferenceDataCreatorActor(configuration)));
-
+            _referenceDataCreatorActor = Context.ActorOf(Props.Create(() => new ReferenceDataCreatorActor(
+                Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcode.csv"))));
         }
 
         private void HandleFileAnalysisFinishedMessage(FileAnalysisFinishedMessage message)
@@ -63,9 +63,9 @@ namespace NHSData.Actors
                 // Create the Reference Data now
                 //CreateReferenceDataCreatorActor();
                 //_referenceDataCreatorActor.Tell(new InitiateAnalysisMessage());
-            //}
-            //else if (Sender.Equals(_referenceDataCreatorActor))
-            //{
+            }
+            else if (Sender.Equals(_referenceDataCreatorActor))
+            {
                 Thread.Sleep(100);
                 Context.System.Terminate();
             }

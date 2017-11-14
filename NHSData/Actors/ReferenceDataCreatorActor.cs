@@ -1,52 +1,44 @@
-﻿using System.Collections.Generic;
-using Akka.Actor;
+﻿using Akka.Actor;
 using Akka.Event;
-using CsvHelper;
-using NHSData.Common;
+using NHSData.CsvMaps;
 using NHSData.DataObjects;
 using NHSData.Messages;
 using NHSData.ReferenceData;
-using NLog;
 
 namespace NHSData.Actors
 {
     public class ReferenceDataCreatorActor : ReceiveActor
     {
-        private readonly ICsvReader _postcodeCsvReader; 
-        private readonly IReferenceDataReader _addressReferenceDataReader;
+        private readonly IActorRef _postcodeCsvReader;
+        private readonly ILoggingAdapter _logger;
         private readonly IReferenceDataWriter _postcodeReferenceDataWriter;
-        private ILoggingAdapter Logger;
-        public ReferenceDataCreatorActor(IConfiguration configuration)
+        public ReferenceDataCreatorActor(string sourcePath)
         {
-            _addressReferenceDataReader = configuration.ReferenceDataReader;
-            _postcodeReferenceDataWriter = configuration.ReferenceDataWriter;
-            _postcodeCsvReader = configuration.Reader;
-            Logger = Context.GetLogger();
+            _postcodeCsvReader = Context.ActorOf(Props.Create<CsvReaderActor<PostcodeRow, PostcodeMap>>(sourcePath));
+            _postcodeReferenceDataWriter = new PostcodeReferenceDataWriter();
+            _logger = Context.GetLogger();
 
             Receive<InitiateAnalysisMessage>(message =>
             {
-                Logger.Info($"Received {nameof(message)}, proceeding with Reference Data generation.");
-                PopulateReferenceData();
+                _logger.Info($"Received {nameof(message)}, proceeding with Reference Data generation.");
+                _postcodeCsvReader.Tell(new InitiateAnalysisMessage());
             });
+
+            Receive<DataRowMessage>(message => PopulateReferenceData(message));
+
+            Receive<FileAnalysisFinishedMessage>(message => WriteReferenceData());
         }
 
-        private void PopulateReferenceData()
+        private void PopulateReferenceData(DataRowMessage message)
         {
-            // Step 1: Load Address Reference Data
-            //_addressReferenceDataReader.LoadReferenceData();
-            //var practiceToPostcodeLookup = _addressReferenceDataReader.GetReferenceData();
+            _postcodeReferenceDataWriter.UpdateReferenceData(message.Row);
+        }
 
-            // Step 3: Generate Practice to Region lookup
-            //_dataWriter.WriteReferenceData();
-            while (_postcodeCsvReader.Read())
-            {
-                var row = _postcodeCsvReader.GetRecord<PostcodeRow>();
-                _postcodeReferenceDataWriter.UpdateReferenceData(row);
-            }
-
-            Logger.Info($"Analysis Complete, writing to file.");
+        private void WriteReferenceData()
+        {
+            _logger.Info("Received FileAnalysisFinishedMessage, commiting changes");
             _postcodeReferenceDataWriter.WriteReferenceData();
-
+            _logger.Info("Finished writing Postcode Reference Data.");
             Context.Parent.Tell(new FileAnalysisFinishedMessage());
         }
     }

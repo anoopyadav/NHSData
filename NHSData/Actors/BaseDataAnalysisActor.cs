@@ -1,14 +1,7 @@
-﻿using System;
-using System.CodeDom;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using Akka.Actor;
 using Akka.Event;
-using CsvHelper;
-using NHSData.Common;
 using NHSData.DataAnalyzers;
-using NHSData.DataObjects;
 using NHSData.Messages;
 
 namespace NHSData.Actors
@@ -17,8 +10,6 @@ namespace NHSData.Actors
     {
         protected ILoggingAdapter Logger { get; }
         protected IDataAnalyzer Analyzer { get; }
-        protected IConfiguration Configuration { get; }
-        protected ICsvReader CsvReader { get; }
         protected IActorRef CsvReaderActor { get; }
 
         protected BaseDataAnalysisActor(IDataAnalyzer analyzer, string sourcePath)
