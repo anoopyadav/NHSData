@@ -16,7 +16,7 @@ namespace NHSData.Actors
 
         public CsvReaderActor(string sourcePath)
         {
-            _logger = Context.GetLogger();
+            _logger = Context.GetLogger("CsvReaderActor");
             _sourcePath = sourcePath;
 
             var configuration = new CsvConfiguration();

@@ -81,6 +81,7 @@
     <Compile Include="DataObjects\AddressReferenceDataRow.cs" />
     <Compile Include="DataObjects\AddressRow.cs" />
     <Compile Include="DataObjects\DataRow.cs" />
+    <Compile Include="DataObjects\LocationReferenceDataRow.cs" />
     <Compile Include="DataObjects\PostcodeRow.cs" />
     <Compile Include="Messages\DataRowMessage.cs" />
     <Compile Include="Messages\FileAnalysisFinishedMessage.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="ReferenceData\IReferenceDataReader.cs" />
     <Compile Include="ReferenceData\IReferenceDataWriter.cs" />
     <Compile Include="ReferenceData\LocationReferenceDataReader.cs" />
+    <Compile Include="ReferenceData\LocationReferenceDataWriter.cs" />
     <Compile Include="ReferenceData\PostcodeReferenceDataWriter.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -42,7 +42,7 @@ namespace NHSData.Actors
             //IConfiguration configuration = new AddressConfiguration();
             IDataAnalyzer analyzer = new AddressDataAnalyzer("London");
             _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor<AddressRow, AddressMap>(analyzer, Path.Combine
-                (ConfigurationManager.AppSettings["DataDirectory"], "address.csv"))), nameof(AddressDataAnalysisActor<AddressRow, AddressMap>));
+                (ConfigurationManager.AppSettings["DataDirectory"], "address.csv"))), "AddressDataAnalysisActor");
         }
 
         private void CreateReferenceDataCreatorActor()
@@ -59,13 +59,10 @@ namespace NHSData.Actors
             {
                 _logger.Info("Sending Publish Message");
                 _addressDataAnalysisActor.Tell(new PublishResultsMessage());
-
-                // Create the Reference Data now
-                //CreateReferenceDataCreatorActor();
-                //_referenceDataCreatorActor.Tell(new InitiateAnalysisMessage());
             }
             else if (Sender.Equals(_referenceDataCreatorActor))
             {
+                _logger.Info("Shutting Down...");
                 Thread.Sleep(100);
                 Context.System.Terminate();
             }
