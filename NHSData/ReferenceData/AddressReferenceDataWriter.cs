@@ -7,26 +7,7 @@ using NHSData.DataObjects;
 
 namespace NHSData.ReferenceData
 {
-    public class AddressReferenceData
-    {
-        public string PracticeCode { get; }
-        public string Postcode { get; }
 
-        public AddressReferenceData(string practiceCode, string postcode)
-        {
-            PracticeCode = practiceCode;
-            Postcode = postcode;
-        }
-    }
-
-    public class AddressReferenceDataMap : CsvClassMap<AddressReferenceData>
-    {
-        public AddressReferenceDataMap()
-        {
-            Map(m => m.PracticeCode).Name("PracticeCode");
-            Map(m => m.Postcode).Name("Postcode");
-        }
-    }
     public class AddressReferenceDataWriter : IReferenceDataWriter
     {
         private readonly Dictionary<string, string> _practicesToPostcodeMap;
@@ -38,7 +19,7 @@ namespace NHSData.ReferenceData
         }
         public void UpdateReferenceData(IDataRow row)
         {
-            var addressRow = (Address) row;
+            var addressRow = (AddressRow) row;
             if (!_practicesToPostcodeMap.ContainsKey(addressRow.PracticeCode))
             {
                 _practicesToPostcodeMap[StripWhitespace(addressRow.PracticeCode)] = 
@@ -51,16 +32,13 @@ namespace NHSData.ReferenceData
             var destinationFile = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"],
                 ConfigurationManager.AppSettings["AddressReferenceData"]);
 
-            var configuration = new CsvConfiguration();
-            configuration.RegisterClassMap<AddressReferenceDataMap>();
-
             using (_referenceDataWriter =
                 new CsvWriter(new StreamWriter(destinationFile)))
             {
-                _referenceDataWriter.WriteHeader<AddressReferenceData>();
+                _referenceDataWriter.WriteHeader<AddressReferenceDataRow>();
                 foreach (var row in _practicesToPostcodeMap)
                 {
-                    _referenceDataWriter.WriteRecord(new AddressReferenceData(row.Key, row.Value));
+                    _referenceDataWriter.WriteRecord(new AddressReferenceDataRow(row.Key, row.Value));
                 }
             }
         }

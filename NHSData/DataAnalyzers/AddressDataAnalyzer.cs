@@ -17,15 +17,15 @@ namespace NHSData.DataAnalyzers
 
         public void ConsumeRow(IDataRow row)
         {
-            if (row.GetType() != typeof(Address))
+            if (row.GetType() != typeof(AddressRow))
             {
                 throw new InvalidCastException();
             }
-            var addressRow = (Address)row;
+            var addressRow = (AddressRow)row;
             CountLocations(addressRow);
         }
 
-        private void CountLocations(Address row)
+        private void CountLocations(AddressRow row)
         {
             if (row.Locality.Replace(" ", string.Empty).Equals(_location, StringComparison.InvariantCultureIgnoreCase))
             {
