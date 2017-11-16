@@ -32,9 +32,6 @@ namespace NHSData.Actors
 
         public void ParseCsvFile()
         {
-            //_csvReader.Read();
-            //_csvReader.ReadHeader();
-
             while (_csvReader.Read())
             {
                 var record = _csvReader.GetRecord<TRowType>() as IDataRow;

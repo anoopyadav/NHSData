@@ -35,7 +35,6 @@ namespace NHSData.Actors
             Receive<FileAnalysisFinishedMessage>(message => PostAnalysis());
         }
 
-        //protected abstract void PerformAnalysis();
         protected abstract void ProcessRow(DataRowMessage message);
         protected abstract void PostAnalysis();
     }

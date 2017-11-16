@@ -39,7 +39,6 @@ namespace NHSData.Actors
 
         private void CreateAddressAnalysisActor()
         {
-            //IConfiguration configuration = new AddressConfiguration();
             IDataAnalyzer analyzer = new AddressDataAnalyzer("London");
             _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor<AddressRow, AddressMap>(analyzer, Path.Combine
                 (ConfigurationManager.AppSettings["DataDirectory"], "address.csv"))), "AddressDataAnalysisActor");
