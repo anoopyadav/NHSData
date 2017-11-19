@@ -7,18 +7,22 @@ using NHSData.DataObjects;
 
 namespace NHSData.ReferenceData
 {
-    public class PostcodeReferenceData
+    public class PostcodeReferenceDataRow : IDataRow
     {
         public string Postcode { get; set; }
         public string Region { get; set; }
-        public PostcodeReferenceData(string postcode, string region)
+        public PostcodeReferenceDataRow(string postcode, string region)
         {
             Postcode = postcode;
             Region = region;
         }
+
+        public PostcodeReferenceDataRow()
+        {
+        }
     }
 
-    public sealed class PostcodeReferenceDataMap : CsvClassMap<PostcodeReferenceData>
+    public sealed class PostcodeReferenceDataMap : CsvClassMap<PostcodeReferenceDataRow>
     {
         public PostcodeReferenceDataMap()
         {
@@ -49,10 +53,10 @@ namespace NHSData.ReferenceData
             var destinationFile = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "RegionReferenceData.csv");
             using (_referenceDataWriter = new CsvWriter(new StreamWriter(destinationFile)))
             {
-                _referenceDataWriter.WriteHeader<PostcodeReferenceData>();
+                _referenceDataWriter.WriteHeader<PostcodeReferenceDataRow>();
                 foreach (var pair in _postcodeToRegionMap)
                 {
-                    _referenceDataWriter.WriteRecord(new PostcodeReferenceData(pair.Key, pair.Value));
+                    _referenceDataWriter.WriteRecord(new PostcodeReferenceDataRow(pair.Key, pair.Value));
                 }
             }
         }

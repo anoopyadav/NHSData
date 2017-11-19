@@ -69,6 +69,7 @@
     <Compile Include="Actors\BaseDataAnalysisActor.cs" />
     <Compile Include="Actors\CoordinatorActor.cs" />
     <Compile Include="Actors\CsvReaderActor.cs" />
+    <Compile Include="Actors\PrescriptionDataAnalysisActor.cs" />
     <Compile Include="Actors\ReferenceDataCreatorActor.cs" />
     <Compile Include="Common\AddressConfiguration.cs" />
     <Compile Include="Common\IConfiguration.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="CsvMaps\AddressMap.cs" />
     <Compile Include="CsvMaps\AddressReferenceDataMap.cs" />
     <Compile Include="CsvMaps\PostcodeMap.cs" />
+    <Compile Include="CsvMaps\PrescriptionMap.cs" />
     <Compile Include="DataAnalyzers\AddressDataAnalyzer.cs" />
     <Compile Include="DataAnalyzers\IDataAnalyzer.cs" />
     <Compile Include="DataObjects\AddressReferenceDataRow.cs" />
@@ -83,8 +85,10 @@
     <Compile Include="DataObjects\DataRow.cs" />
     <Compile Include="DataObjects\LocationReferenceDataRow.cs" />
     <Compile Include="DataObjects\PostcodeRow.cs" />
+    <Compile Include="DataObjects\PrescriptionRow.cs" />
     <Compile Include="Messages\DataRowMessage.cs" />
     <Compile Include="Messages\FileAnalysisFinishedMessage.cs" />
+    <Compile Include="Messages\LoadReferenceDataMessage.cs" />
     <Compile Include="Messages\PublishResultsMessage.cs" />
     <Compile Include="Messages\GetResultsResponseMessage.cs" />
     <Compile Include="Messages\InitiateAnalysisMessage.cs" />

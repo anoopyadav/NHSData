@@ -1,9 +1,9 @@
 ﻿namespace NHSData.DataObjects
 {
-    public class AddressReferenceDataRow
+    public class AddressReferenceDataRow : IDataRow
     {
-        public string PracticeCode { get; }
-        public string Postcode { get; }
+        public string PracticeCode { get; set; }
+        public string Postcode { get; set; }
 
         public AddressReferenceDataRow(string practiceCode, string postcode)
         {

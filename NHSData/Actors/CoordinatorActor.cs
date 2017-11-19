@@ -18,6 +18,7 @@ namespace NHSData.Actors
         private readonly ILoggingAdapter _logger;
         private IActorRef _addressDataAnalysisActor;
         private IActorRef _referenceDataCreatorActor;
+        private IActorRef _prescriptionDataAnalysisActor;
 
         public CoordinatorActor()
         {
@@ -50,6 +51,14 @@ namespace NHSData.Actors
                 Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcode.csv"))));
         }
 
+        private void CreatePrescriptionAnalysisActor()
+        {
+            IDataAnalyzer analyzer = new AddressDataAnalyzer("");
+            _prescriptionDataAnalysisActor = Context.ActorOf(Props.Create(() => new
+                PrescriptionDataAnalysisActor<PrescriptionRow, PrescriptionMap>(analyzer,
+                    Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "prescription.csv"))));
+        }
+
         private void HandleFileAnalysisFinishedMessage(FileAnalysisFinishedMessage message)
         {
             _logger.Info($"Received finished message from {Sender}");
@@ -58,8 +67,15 @@ namespace NHSData.Actors
             {
                 _logger.Info("Sending Publish Message");
                 _addressDataAnalysisActor.Tell(new PublishResultsMessage());
+                _addressDataAnalysisActor.Tell(PoisonPill.Instance);
             }
             else if (Sender.Equals(_referenceDataCreatorActor))
+            {
+                _referenceDataCreatorActor.Tell(PoisonPill.Instance);
+                CreatePrescriptionAnalysisActor();
+                _prescriptionDataAnalysisActor.Tell(new LoadReferenceDataMessage());
+            }
+            else if (Sender.Equals(_prescriptionDataAnalysisActor))
             {
                 _logger.Info("Shutting Down...");
                 Thread.Sleep(100);
