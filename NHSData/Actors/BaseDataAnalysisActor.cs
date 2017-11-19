@@ -17,7 +17,12 @@ namespace NHSData.Actors
             Analyzer = analyzer;
             Logger = Context.GetLogger();
             CsvReaderActor = Context.ActorOf(Props.Create<CsvReaderActor<TRowType, TRowMap>>(sourcePath), $"CsvReaderActor");
+            Become(ProcessData);
+            Logger.Info("Base Constructor");
+        }
 
+        protected void ProcessData()
+        {
             Receive<InitiateAnalysisMessage>(message =>
             {
                 Logger.Info("Received InitiateAnalysisMessage, Proceeding with file analysis.");

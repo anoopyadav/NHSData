@@ -9,7 +9,7 @@ namespace NHSData.CsvMaps
         {
             Map(m => m.Sha).Name("SHA");
             Map(m => m.Pct).Name("PCT");
-            Map(m => m.PracticeCode).Name("PracticeCode");
+            Map(m => m.PracticeCode).Name("PRACTICE");
             Map(m => m.PrescriptionCode).Name("BNF CODE");
             Map(m => m.PrescriptionName).Name("BNF NAME");
             Map(m => m.NumberOfItems).Name("ITEMS");

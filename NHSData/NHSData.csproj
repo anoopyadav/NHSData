@@ -80,6 +80,7 @@
     <Compile Include="CsvMaps\PrescriptionMap.cs" />
     <Compile Include="DataAnalyzers\AddressDataAnalyzer.cs" />
     <Compile Include="DataAnalyzers\IDataAnalyzer.cs" />
+    <Compile Include="DataAnalyzers\PrescriptionDataAnalyzer.cs" />
     <Compile Include="DataObjects\AddressReferenceDataRow.cs" />
     <Compile Include="DataObjects\AddressRow.cs" />
     <Compile Include="DataObjects\DataRow.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Messages\GetResultsResponseMessage.cs" />
     <Compile Include="Messages\InitiateAnalysisMessage.cs" />
     <Compile Include="Messages\ReferenceDataAnalysisFinishedMessage.cs" />
+    <Compile Include="Messages\ReferenceDataLoadedMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferenceData\AddressReferenceDataWriter.cs" />

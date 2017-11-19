@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Net;
 using Akka.Actor;
 using NHSData.CsvMaps;
 using NHSData.DataAnalyzers;
@@ -25,16 +27,25 @@ namespace NHSData.Actors
             _practiceCodeToRegion = new Dictionary<string, string>();
             _practicecodeToPostcode = new Dictionary<string, string>();
 
-            Receive<LoadReferenceDataMessage>(message => Become(LoadReferenceData));
+            Logger.Info("Prescription Constructor");
+            Become(Waiting);
+        }
+
+        private void Waiting()
+        {
+            Receive<LoadReferenceDataMessage>(message =>
+            {
+                Logger.Info("Received LoadReferenceDataMessage, loading location reference data");
+                CreateReferenceDataReaderActors();
+                _regionReferenceDataReaderActor.Tell(new InitiateAnalysisMessage());
+                _postcodeReferenceDataReaderActor.Tell(new InitiateAnalysisMessage());
+
+                Become(LoadReferenceData);
+            });
         }
 
         private void LoadReferenceData()
         {
-            Logger.Info("Received InitiateAnalysisMessage, loading location reference data");
-            CreateReferenceDataReaderActors();
-            _regionReferenceDataReaderActor.Tell(new InitiateAnalysisMessage());
-            _postcodeReferenceDataReaderActor.Tell(new InitiateAnalysisMessage());
-
             Receive<DataRowMessage>(message => PopulateReferenceData(message));
             Receive<FileAnalysisFinishedMessage>(message => CheckReferenceDataLoaded());
         }
@@ -46,13 +57,9 @@ namespace NHSData.Actors
             if (_referenceDataCount == 2)
             {
                 Logger.Info("Received FileAnalysisFinishedMessage, proceeding with prescription analysis");
-                Become(ProcessPrescriptionData);
+                Become(ProcessData);
+                Self.Tell(new InitiateAnalysisMessage());
             }
-        }
-
-        private void ProcessPrescriptionData()
-        {
-            Context.Parent.Tell(new FileAnalysisFinishedMessage());
         }
 
         private void PopulateReferenceData(DataRowMessage message)
@@ -82,14 +89,23 @@ namespace NHSData.Actors
                     Props.Create<CsvReaderActor<LocationReferenceDataRow, LocationReferenceDataMap>>(sourcePath));
         }
 
+        #region Overrides
         protected override void ProcessRow(DataRowMessage message)
         {
-            throw new System.NotImplementedException();
+            if (message.RowType != typeof(PrescriptionRow))
+            {
+                throw new InvalidCastException();
+            }
+
+            dynamic prescriptionRow = Convert.ChangeType(message.Row, message.RowType);
+            Analyzer.ConsumeRow(prescriptionRow);
         }
 
         protected override void PostAnalysis()
         {
-            throw new System.NotImplementedException();
+            Logger.Info("PostAnalysis called");
+            Context.Parent.Tell(new FileAnalysisFinishedMessage());
         }
+        #endregion
     }
 }

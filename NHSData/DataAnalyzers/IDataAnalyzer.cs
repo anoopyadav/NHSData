@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using NHSData.DataObjects;
-using NLog.LogReceiverService;
 
 namespace NHSData.DataAnalyzers
 {

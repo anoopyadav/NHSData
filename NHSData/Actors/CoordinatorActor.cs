@@ -40,6 +40,7 @@ namespace NHSData.Actors
 
         private void CreateAddressAnalysisActor()
         {
+            _logger.Info("Creating AddressDataAnalysisActor");
             IDataAnalyzer analyzer = new AddressDataAnalyzer("London");
             _addressDataAnalysisActor = Context.ActorOf(Props.Create(() => new AddressDataAnalysisActor<AddressRow, AddressMap>(analyzer, Path.Combine
                 (ConfigurationManager.AppSettings["DataDirectory"], "address.csv"))), "AddressDataAnalysisActor");
@@ -47,13 +48,15 @@ namespace NHSData.Actors
 
         private void CreateReferenceDataCreatorActor()
         {
+            _logger.Info("Creting ReferenceDataAnalysisActor");
             _referenceDataCreatorActor = Context.ActorOf(Props.Create(() => new ReferenceDataCreatorActor(
-                Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcode.csv"))));
+                Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "postcode.csv"))), "PrescriptionDataAnalysisActor");
         }
 
         private void CreatePrescriptionAnalysisActor()
         {
-            IDataAnalyzer analyzer = new AddressDataAnalyzer("");
+            _logger.Info("Creating PrescriptionDataAnalysisActor");
+            IDataAnalyzer analyzer = new PrescriptionDataAnalyzer();
             _prescriptionDataAnalysisActor = Context.ActorOf(Props.Create(() => new
                 PrescriptionDataAnalysisActor<PrescriptionRow, PrescriptionMap>(analyzer,
                     Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "prescription.csv"))));
