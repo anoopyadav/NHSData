@@ -80,8 +80,9 @@ namespace NHSData.Actors
             }
             else if (Sender.Equals(_prescriptionDataAnalysisActor))
             {
+                _prescriptionDataAnalysisActor.Tell(new PublishResultsMessage());
                 _logger.Info("Shutting Down...");
-                Thread.Sleep(100);
+                Console.ReadLine();
                 Context.System.Terminate();
             }
         }

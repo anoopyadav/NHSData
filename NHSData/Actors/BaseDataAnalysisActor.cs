@@ -32,7 +32,10 @@ namespace NHSData.Actors
             Receive<PublishResultsMessage>(message =>
             {
                 Logger.Info("Publishing Results.");
-                Logger.Info($"Results - {Analyzer.GetResults().First().ToString()}");
+                foreach (var result in Analyzer.GetResults())
+                {
+                    Logger.Info($"{result.Item1} {result.Item2}");
+                }
             });
 
             Receive<DataRowMessage>(message => ProcessRow(message));

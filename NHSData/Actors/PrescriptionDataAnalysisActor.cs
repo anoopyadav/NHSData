@@ -14,9 +14,8 @@ namespace NHSData.Actors
 {
     public class PrescriptionDataAnalysisActor<TRowType, TRowMap> : BaseDataAnalysisActor<TRowType, TRowMap>
     {
-        private IActorRef _prescriptionCsvReaderActor;
-        private Dictionary<string, string> _practiceCodeToRegion;
-        private Dictionary<string, string> _practicecodeToPostcode;
+        private readonly Dictionary<string, string> _postcodeToRegion;
+        private readonly Dictionary<string, string> _practiceCodeToPostcode;
         private IActorRef _regionReferenceDataReaderActor;
         private IActorRef _postcodeReferenceDataReaderActor;
         private int _referenceDataCount;
@@ -24,8 +23,8 @@ namespace NHSData.Actors
         public PrescriptionDataAnalysisActor(IDataAnalyzer prescriptionAnalyzer, string sourcePath) 
             : base(prescriptionAnalyzer, sourcePath)
         {
-            _practiceCodeToRegion = new Dictionary<string, string>();
-            _practicecodeToPostcode = new Dictionary<string, string>();
+            _postcodeToRegion = new Dictionary<string, string>();
+            _practiceCodeToPostcode = new Dictionary<string, string>();
 
             Logger.Info("Prescription Constructor");
             Become(Waiting);
@@ -54,12 +53,19 @@ namespace NHSData.Actors
         {
             _referenceDataCount++;
 
-            if (_referenceDataCount == 2)
-            {
-                Logger.Info("Received FileAnalysisFinishedMessage, proceeding with prescription analysis");
-                Become(ProcessData);
-                Self.Tell(new InitiateAnalysisMessage());
-            }
+            if (_referenceDataCount != 2) return;
+
+            Logger.Info("Reference Data loaded, proceeding with prescription analysis");
+            UpdateAnalyzer();
+            Become(ProcessData);
+            Self.Tell(new InitiateAnalysisMessage());
+        }
+
+        private void UpdateAnalyzer()
+        {
+            var prescriptionAnalyzer = (PrescriptionDataAnalyzer) Analyzer;
+            prescriptionAnalyzer.PracticeCodeToPostcode = _practiceCodeToPostcode;
+            prescriptionAnalyzer.PostcodeToRegion = _postcodeToRegion;
         }
 
         private void PopulateReferenceData(DataRowMessage message)
@@ -67,13 +73,13 @@ namespace NHSData.Actors
             if (message.RowType == typeof(PostcodeReferenceDataRow))
             {
                 var postcodeRow = (PostcodeReferenceDataRow) message.Row;
-                _practicecodeToPostcode.Add(postcodeRow.Postcode, postcodeRow.Region);
+                _postcodeToRegion.Add(postcodeRow.Postcode, postcodeRow.Region);
 
             }
             else if (message.RowType == typeof(LocationReferenceDataRow))
             {
                 var locationRow = (LocationReferenceDataRow) message.Row;
-                _practiceCodeToRegion.Add(locationRow.PracticeCode, locationRow.Postcode);
+                _practiceCodeToPostcode.Add(locationRow.PracticeCode, locationRow.Postcode);
             }
         }
 
@@ -83,7 +89,7 @@ namespace NHSData.Actors
             _regionReferenceDataReaderActor =
                 Context.ActorOf(Props.Create <CsvReaderActor<PostcodeReferenceDataRow, PostcodeReferenceDataMap>>(sourcePath));
 
-            sourcePath = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "AddressReferenceData.csv");
+            sourcePath = Path.Combine(ConfigurationManager.AppSettings["DataDirectory"], "PostcodeReferenceData.csv");
             _postcodeReferenceDataReaderActor =
                 Context.ActorOf(
                     Props.Create<CsvReaderActor<LocationReferenceDataRow, LocationReferenceDataMap>>(sourcePath));
